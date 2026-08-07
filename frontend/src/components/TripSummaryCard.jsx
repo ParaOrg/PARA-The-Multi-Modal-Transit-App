@@ -1,65 +1,62 @@
 /**
- * TripSummaryCard.jsx — Route itinerary with visual segment connectors.
+ * TripSummaryCard.jsx — Figma-inspired route cards, one per segment.
  */
 
 export default function TripSummaryCard({ routeData }) {
   if (!routeData) return null;
-  const { segments = [], total_fare, total_time_min, message } = routeData;
+  const { segments = [], total_fare, total_time_min } = routeData;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-      {/* Header */}
-      <div className="px-4 py-3 bg-purple-50 border-b border-purple-100">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-bold text-purple-900">{message || "Route found"}</p>
-          {routeData.biyahe_score != null && (
-            <span className="text-[10px] font-bold bg-purple-200 text-purple-900 px-2 py-0.5 rounded-full" title="Biyahe Score — composite rating based on time, cost, hassle, safety, reliability, and community preference">
-              🏷️ {(typeof routeData.biyahe_score === 'object' ? routeData.biyahe_score.biyahe_score : routeData.biyahe_score) * 100:.0f}%
-            </span>
-          )}
-        </div>
-        <div className="flex gap-4 mt-1 text-xs text-purple-700">
-          <span>⏱ {total_time_min} min</span>
-          <span>💰 ₱{total_fare}</span>
-          <span>🔄 {segments.filter((s) => s.is_transfer).length} transfer(s)</span>
-        </div>
-      </div>
+    <div className="space-y-2">
+      {/* Each segment gets its own card */}
+      {segments.map((seg, i) => {
+        const isWalk = seg.is_transfer || seg.type === "walk";
+        const emoji = isWalk ? "🚶" : "🚌";
+        const dist = seg.distance_display || (seg.distance_m >= 1000 
+          ? (seg.distance_m / 1000).toFixed(1) + " km" 
+          : seg.distance_m + "m");
+        const title = isWalk 
+          ? `Walk ${seg.time_min} min` 
+          : `${seg.route || "Transit"} (${seg.time_min} min)`;
+        const detail = isWalk
+          ? `${dist} walking`
+          : `${dist} · ₱${seg.fare}`;
 
-      {/* Segments with connectors */}
-      <div className="px-4 py-2">
-        {segments.map((seg, i) => {
-          const isWalk = seg.is_transfer || seg.type === "walk";
-          const isLast = i === segments.length - 1;
-          const emoji = isWalk ? "🚶" : seg.type === "train" || seg.type === "lrt" || seg.type === "mrt" ? "🚆" : "🚌";
-          const bg = isWalk ? "bg-gray-100" : "bg-purple-50";
-          const textColor = isWalk ? "text-gray-600" : "text-purple-900";
-
-          return (
-            <div key={i}>
-              {/* Connector line from previous segment */}
-              {i > 0 && (
-                <div className="flex justify-center py-0.5">
-                  <div className="w-0.5 h-4 bg-gray-300 rounded" />
-                </div>
-              )}
-
-              {/* Segment row */}
-              <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${bg}`}>
-                <span className="text-lg shrink-0">{emoji}</span>
+        return (
+          <div key={i} className="bg-white rounded-2xl overflow-hidden border border-gray-100">
+            <div className="flex">
+              {/* Left color bar */}
+              <div className={`w-[11px] rounded-l-xl shrink-0 ${
+                isWalk ? "bg-gray-300" : "bg-[#7A4BC8]"
+              }`} />
+              
+              <div className="flex-1 flex items-center gap-2 px-3 py-2.5">
+                {/* Emoji */}
+                <span className="text-base shrink-0">{emoji}</span>
+                
+                {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium truncate ${textColor}`}>
-                    {isWalk
-                      ? isLast ? "Walk to destination" : "Walk transfer"
-                      : seg.route || "Transit"}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {seg.time_min} min · {seg.distance_m}m{!isWalk ? ` · ₱${seg.fare}` : ""}
-                  </p>
+                  <p className="text-[#381D65] text-[11px] font-bold leading-tight">{title}</p>
+                  <p className="text-[#381D65] text-[10px] leading-tight mt-0.5">{detail}</p>
+                </div>
+
+                {/* Time badge */}
+                <div className="text-[#7A4BC8] text-[10px] font-bold shrink-0">
+                  {seg.time_min}min
                 </div>
               </div>
             </div>
-          );
-        })}
+          </div>
+        );
+      })}
+
+      {/* Total bar */}
+      <div className="bg-[#7A4BC81A] rounded-2xl px-3 py-2 flex items-center justify-between">
+        <span className="text-[#381D65] text-[10px] font-bold">Total</span>
+        <div className="flex gap-3 text-[#381D65] text-[10px]">
+          <span>⏱ {total_time_min} min</span>
+          <span>💰 ₱{total_fare}</span>
+        </div>
       </div>
     </div>
   );
