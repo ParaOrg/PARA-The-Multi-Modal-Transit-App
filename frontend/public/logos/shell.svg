@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <circle cx="20" cy="20" r="20" fill="#E8C200"/>
+  <!-- Shell scallop shape simplified -->
+  <path d="M20 6 C13 6 8 11 8 17 C8 22 11 26 15 28 L15 32 L25 32 L25 28 C29 26 32 22 32 17 C32 11 27 6 20 6Z" fill="#E30613"/>
+  <path d="M20 8 C14 8 10 12.5 10 17 C10 21 12.5 24.5 16 26.5 L16 30 L24 30 L24 26.5 C27.5 24.5 30 21 30 17 C30 12.5 26 8 20 8Z" fill="#FBB900"/>
+  <text x="20" y="23" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="bold" fill="#E30613">SHELL</text>
+</svg>

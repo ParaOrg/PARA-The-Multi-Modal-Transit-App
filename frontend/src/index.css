@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+/* Mobile chat panel */
+@media (max-width: 768px) {
+  .leaflet-container {
+    height: 45vh !important;
+  }
+}
+
+/* Full-height base */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .leaflet-container {
+    height: 100% !important;
+    width: 100% !important;
+  }
+}

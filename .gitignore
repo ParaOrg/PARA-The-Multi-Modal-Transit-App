@@ -1,0 +1,48 @@
+# ==========================================
+# Frontend & Dependencies
+# ==========================================
+# Ignore Node.js packages in the frontend and anywhere else in the repository
+node_modules/
+**/node_modules/
+
+# Production build outputs (if Vite, React, or static builds are used)
+frontend/dist/
+frontend/build/
+*.log
+
+# ==========================================
+# Local Data & Logs
+# ==========================================
+# Ignore local route run logs / temporary JSON datasets
+commute_logs/
+*.json.log
+
+# ==========================================
+# Environment Variables & Secrets
+# ==========================================
+# Never commit credentials, API keys, or database secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# ==========================================
+# Python & Runtime Artifacts
+# ==========================================
+# Python bytecode, virtual environments, and cache
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+*.so
+
+# ==========================================
+# IDE & System Files
+# ==========================================
+# OS temporary files and IDE settings
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

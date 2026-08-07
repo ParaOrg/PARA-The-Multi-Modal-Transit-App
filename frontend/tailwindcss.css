@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+html,
+body,
+#root,
+button,
+input,
+select,
+textarea {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Ensure React Router wrapper elements fill the main container */
+main > * {
+  min-height: 100%;
+}
+
+/* ── Custom animations ── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInItem {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.route-list-item {
+  animation: fadeInItem 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* @font-face{
+    font-family: 'Impact'; 
+    src: url('/src/assets/fonts/Impact.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal; 
+    font-display: swap;
+}
+
+@theme {
+    --font-impact: "Impact-Web" "Arial Black", sans-serif;    
+
+    --tracking-clock: -0.02em;
+}
+
+@layer components {
+  .clock-display {
+    @apply font-impact tracking-clock tabular-nums;
+  }
+} */
