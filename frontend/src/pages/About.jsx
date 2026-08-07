@@ -105,7 +105,7 @@ function AutoScenarioCarousel({ items }) {
           </div>
         ))}
         </div>
-      <LandingPageFooter />
+      
     </div>
   );
 }
@@ -378,6 +378,31 @@ export default function About() {
               Stay updated
             </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-5 leading-tight">
+              Built for the Community, By the Community</h2>
+            <p className="text-base sm:text-lg md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+              Every route recorded, every place mapped, and every commute tracked directly benefits 
+              jeepney drivers, transport cooperatives, and urban planners working toward a better 
+              public transit system. Para PH is not just an app — it&rsquo;s a community of innovators, 
+              commuters, and policymakers building a publicly-owned commute system for Metro Manila.
+            </p>
+            <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-10 text-center">
+              <div className="bg-[#7A4BC81A] rounded-2xl p-4">
+                <p className="text-2xl mb-1">🚐</p>
+                <p className="text-xs font-bold text-[#381D65]">For Commuters</p>
+                <p className="text-[10px] text-gray-500 mt-1">Real routes, real data, real savings</p>
+              </div>
+              <div className="bg-[#7A4BC81A] rounded-2xl p-4">
+                <p className="text-2xl mb-1">📊</p>
+                <p className="text-xs font-bold text-[#381D65]">For Researchers</p>
+                <p className="text-[10px] text-gray-500 mt-1">Open data for transit studies</p>
+              </div>
+              <div className="bg-[#7A4BC81A] rounded-2xl p-4">
+                <p className="text-2xl mb-1">🏛️</p>
+                <p className="text-xs font-bold text-[#381D65]">For Policymakers</p>
+                <p className="text-[10px] text-gray-500 mt-1">Evidence-based transport planning</p>
+              </div>
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-5 leading-tight">
               Join the Para Community
             </h2>
             <p className="text-base sm:text-lg md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
@@ -402,6 +427,7 @@ export default function About() {
 
       </div>
 
+      
       
       <LandingPageFooter />
     </div>
