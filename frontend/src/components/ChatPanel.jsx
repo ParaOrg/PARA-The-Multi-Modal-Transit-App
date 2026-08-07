@@ -172,6 +172,7 @@ export default function ChatPanel() {
           onClick={() => setCollapsed(!collapsed)}
         >
           <span>🚐 Para PH</span>
+          <span className="text-[10px] text-white/60 hidden sm:inline">Bawat biyahe, tulong sa komunidad 🇵🇭</span>
           <span className="text-white/70 hover:text-white text-lg leading-none select-none">
             {collapsed ? "▲" : "▼"}
           </span>

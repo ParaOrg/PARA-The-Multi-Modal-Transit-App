@@ -149,15 +149,19 @@ export default function HomeNew() {
       {/* MOBILE: New design below */}
       <div className="md:hidden">
       {/* Map */}
+      {/* Logo + motto — top left */}
+      <div className="md:hidden absolute top-4 left-4 z-30 flex flex-col items-center">
+        <img src={paralogo} alt="Para PH" className="w-10 h-10 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.15)]" />
+        <p className="text-[8px] text-gray-700 mt-0.5 font-medium leading-tight text-center drop-shadow-sm">
+          Bawat Byahe,<br/>Tulong sa Komunidad
+        </p>
+      </div>
       <div className="absolute inset-0 z-0">
         <MapComponent markers={routeMarkers} polylines={polylines} showLegend={false} fitBounds={true} />
         
       </div>
 
-      {/* Mobile logo */}
-      <div className="md:hidden absolute top-4 left-4 z-30 flex items-center gap-2">
-        <img src={paralogo} alt="Para PH" className="w-12 h-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.15)]" />
-      </div>
+      
       {/* GPS enable button — always visible when GPS not active */}
       {!gpsActive && (
         <button onClick={() => {

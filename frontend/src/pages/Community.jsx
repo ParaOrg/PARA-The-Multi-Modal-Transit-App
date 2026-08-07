@@ -43,6 +43,21 @@ export default function Community() {
       )}
 
       {/* Community Feed */}
+      <div className="bg-gradient-to-r from-[#381D65] to-[#7A4BC8] text-white">
+        <div className="max-w-2xl mx-auto px-4 py-8">
+          <h2 className="text-xl font-black">Bawat biyahe, tulong sa komunidad. 🇵🇭</h2>
+          <p className="text-sm text-white/80 mt-2 leading-relaxed">
+            Para PH connects commuters, drivers, researchers, and policymakers. 
+            Every route you share, every place you add, and every commute you track 
+            helps build a better, publicly-owned transit system for Metro Manila.
+          </p>
+          <div className="flex gap-4 mt-4 text-xs text-white/70">
+            <span>🚐 For Commuters</span>
+            <span>📊 For Researchers</span>
+            <span>🏛️ For Policymakers</span>
+          </div>
+        </div>
+      </div>
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-black text-gray-900">Community</h1>
