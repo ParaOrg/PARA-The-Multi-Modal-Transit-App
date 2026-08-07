@@ -65,7 +65,7 @@ export default function ChatPanel() {
     realSegments.forEach((seg, i) => {
       if (!seg.geometry || seg.geometry.length < 2) return;
       const coords = seg.geometry.map((c) => [c[1], c[0]]);
-      const isWalk = seg.is_transfer || seg.type === "walk";
+      const isWalk = seg.is_transfer || seg.type === "walk" || (seg.route && seg.route.includes("WALK"));
       const isFirst = i === 0;
       const isLast = i === realSegments.length - 1;
 
