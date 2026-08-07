@@ -14,6 +14,7 @@ class ChatMessage(BaseModel):
     message: str
     session_id: Optional[str] = None
     timestamp: Optional[datetime] = None
+    user_location: Optional[Dict[str, Any]] = None
 
 
 class ChatResponse(BaseModel):

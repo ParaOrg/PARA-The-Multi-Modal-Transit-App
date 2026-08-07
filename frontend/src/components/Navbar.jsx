@@ -5,6 +5,7 @@ import paralogo from '../assets/images/Para1P.png';
 import GasPriceWidget from './GasPrice/index.jsx';
 import { useAuth } from '../context/AuthContext';
 
+
 const NAV_LINKS = [
   { to: '/', label: 'Commute' },
   { to: '/explore', label: 'Explore' },
@@ -94,6 +95,7 @@ export default function Navbar() {
             <span>⛽</span><span>Gas Prices</span>
           </Link>
           
+
           {user && !isGuest ? (
             <button
               onClick={logout}
@@ -104,7 +106,7 @@ export default function Navbar() {
           ) : (
             <>
               <Link to="/login" className="inline-flex h-10 items-center rounded-full px-5 text-sm font-semibold text-gray-700 hover:text-[#7A4BC8] transition-colors whitespace-nowrap">Login</Link>
-              <Link to="/signup" className="inline-flex h-10 items-center rounded-full bg-[#7A4BC8] px-5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(79,0,205,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#3f00a8] hover:shadow-[0_14px_24px_rgba(79,0,205,0.26)] whitespace-nowrap">Sign Up</Link>
+              <Link to="/signup" className="fixed right-4 bottom-4 z-[1000] w-9 h-9 rounded-full bg-[#7A4BC8] text-white flex items-center justify-center text-xl hover:bg-[#381D65] transition-colors shadow-lg cursor-pointer">Sign Up</Link>
             </>
           )}
         </div>

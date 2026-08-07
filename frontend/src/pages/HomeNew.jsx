@@ -96,7 +96,13 @@ export default function HomeNew() {
     setLoading(true);
     setRouteMarkers([]); setPolylines([]);
     try {
-      const res = await fetch(`${API}/chat`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user_id: "guest", message: text }) });
+      const gpsLoc = window.__userLocation;
+      const hasOrigin = /from|mula|galing|papunta/i.test(text);
+      const backendMessage = (!hasOrigin && gpsLoc) ? `from here to ${text}` : text;
+      const body = { user_id: "guest", message: backendMessage };
+      if (gpsLoc) body.user_location = { lat: gpsLoc[0], lng: gpsLoc[1] };
+      console.log("Sending:", body);
+      const res = await fetch(`${API}/chat`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
       setMessages(prev => [...prev, { 
             sender: "bot", 
@@ -131,6 +137,17 @@ export default function HomeNew() {
 
   return (
     <div className="fixed inset-0 bg-white">
+      <button onClick={() => {
+        if (!navigator.geolocation) return;
+        const loc = window.__userLocation;
+        if (loc && window.__paraMap) {
+          window.__paraMap.setView(loc, 17, { animate: true });
+        } else {
+          navigator.geolocation.getCurrentPosition((pos) => {
+            if (window.__paraMap) window.__paraMap.setView([pos.coords.latitude, pos.coords.longitude], 17, { animate: true });
+          });
+        }
+      }} style={{position:"fixed",top:"80px",right:"20px",zIndex:99999,width:"44px",height:"44px",borderRadius:"50%",background:"#7A4BC8",color:"white",border:"3px solid white",boxShadow:"0 4px 16px rgba(122,75,200,0.5)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"20px",cursor:"pointer"}}>⊕</button>
       {/* Full screen map */}
       <div className="absolute inset-0 z-0">
         <MapComponent markers={routeMarkers} polylines={polylines} showLegend={false} fitBounds={true} />
@@ -223,7 +240,14 @@ export default function HomeNew() {
       {showTracker && activeRouteData && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center" onClick={() => setShowTracker(false)}>
           <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-md max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <CommuteTracker routeData={activeRouteData} onComplete={() => { setShowTracker(false); setActiveRouteData(null); }} onCancel={() => setShowTracker(false)} />
+            <CommuteTracker routeData={activeRouteData} 
+            onStart={() => {
+              if (window.__userLocation && window.__paraMap) {
+                window.__paraMap.setView(window.__userLocation, 17, { animate: true });
+              }
+            }}
+            onComplete={() => { setShowTracker(false); setActiveRouteData(null); }} 
+            onCancel={() => setShowTracker(false)} />
           </div>
         </div>
       )}

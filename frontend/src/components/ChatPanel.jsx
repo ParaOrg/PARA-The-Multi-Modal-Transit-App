@@ -129,7 +129,14 @@ export default function ChatPanel() {
     setPolylines([]);
 
     try {
-      const res = await fetch(`${API}/chat`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user_id: "guest", message: text }) });
+      const res = await fetch(`${API}/chat`, { method: "POST", headers: { "Content-Type": "application/json" }, body: (() => {
+        const gps = window.__userLocation;
+        const hasOrigin = /from|mula|galing|papunta/i.test(text);
+        const msg = (!hasOrigin && gps) ? "from here to " + text : text;
+        const payload = { user_id: "guest", message: msg };
+        if (gps) payload.user_location = { lat: gps[0], lng: gps[1] };
+        return JSON.stringify(payload);
+      })() });
       const data = await res.json();
       setMessages((prev) => [...prev, { sender: "bot", text: data.reply_text || data.reply || "No route found", routeData: data.route_data || null }]);
       if (data.route_data) {

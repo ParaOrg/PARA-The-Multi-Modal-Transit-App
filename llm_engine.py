@@ -33,6 +33,8 @@ GAZETTEER_COORDS: Dict[str, tuple] = {
     "ue": (14.6021, 120.9893, "University of the East"),
     "nu": (14.6025, 120.9875, "National University"),
     "pup": (14.5973, 121.0104, "Polytechnic University of the Philippines"),
+    "up": (14.6550, 121.0677, "University of the Philippines Diliman"),
+    "here": (None, None, "Current Location"),
     "upd": (14.6550, 121.0677, "University of the Philippines Diliman"),
     "up diliman": (14.6550, 121.0677, "University of the Philippines Diliman"),
     "ust": (14.6091, 120.9893, "University of Santo Tomas"),
@@ -204,4 +206,11 @@ def parse_chat_intent(text: str) -> Dict:
                 return {"origin": groups[1].strip(), "destination": groups[0].strip(), "intent": "route"}
             return {"origin": groups[0].strip(), "destination": groups[1].strip(), "intent": "route"}
 
+    # Single word or short phrase = destination search
+    words = text_lower.split()
+    if len(words) <= 3:
+        # Check if it looks like a place name (not a greeting/question)
+        if not any(w in text_lower for w in ["hi","hello","help","ano","what","who","sino"]):
+            return {"destination": text_lower.strip(), "intent": "nearby_routes"}
+    
     return {"intent": "unknown", "text": text}

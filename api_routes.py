@@ -96,12 +96,25 @@ async def chat(request: ChatMessage, req: Request):
         origin_raw = intent.get("origin", "")
         dest_raw = intent.get("destination", "")
 
+        # If only destination (no origin), try GPS
+        if dest_raw and not origin_raw and request.user_location:
+            origin_raw = "here"
+        
         if not origin_raw or not dest_raw:
             return ChatResponse(reply_text=(
                 "Please specify both origin and destination. Example: 'from UPD to UST'"
             ))
 
-        origin_geo = await normalize_location(origin_raw)
+        # Handle "here" — use GPS coords if available
+        if origin_raw.lower() in ("here", "current location", "my location"):
+            user_loc = getattr(request, "user_location", None)
+            if user_loc:
+                origin_geo = {"lat": user_loc.get("lat"), "lon": user_loc.get("lng", user_loc.get("lon")), "found": True, "display_name": "Your Location", "source": "gps"}
+            else:
+                origin_geo = None
+        else:
+            origin_geo = await normalize_location(origin_raw)
+        
         dest_geo = await normalize_location(dest_raw)
 
         if not origin_geo or not dest_geo:
@@ -128,21 +141,15 @@ async def chat(request: ChatMessage, req: Request):
         ranked = rank_routes(candidates)
         best_route = ranked[0]
 
-        # Format reply with alternatives info
-        reply_lines = [f"📍 {origin_raw} ➡️ {dest_raw}"]
-        reply_lines.append(f"✅ {best_route['message']} — Biyahe Score: {best_route['biyahe_score']:.0%}")
-        if best_route.get('explanation'):
-            reply_lines.append(f"   🏷️ Biyahe Score: {best_route['biyahe_score']:.0%} — {best_route.get('explanation', 'Standard route')}")
-        
-        if len(ranked) > 1:
-            reply_lines.append(f"\n🔄 {len(ranked)} route options found. Fastest: {best_route['total_time_min']:.0f} min, ₱{best_route['total_fare']:.0f}")
-        
-        reply_lines.append("")
-        reply_lines.extend(_format_segments(best_route))
-        reply_text = "\n".join(reply_lines)
+        # Simple reply text - route cards show the details
+        reply_text = f"Here are {len(ranked)} routes from {origin_raw} to {dest_raw}." if len(ranked) > 1 else f"Here is the best route from {origin_raw} to {dest_raw}."
+
 
         route = best_route
 
+        # Deduplicate alternatives
+        ranked_filtered = [a for a in ranked[1:] if [s.get("route","") for s in a.get("segments",[])] != [s.get("route","") for s in best_route.get("segments",[])]]
+        
         return ChatResponse(
             reply_text=reply_text,
             route_data=route,
