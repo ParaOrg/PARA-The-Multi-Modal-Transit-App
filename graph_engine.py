@@ -12,6 +12,30 @@ import networkx as nx
 from collections import defaultdict
 from typing import Dict, List, Tuple, Optional, Set, Any
 import logging
+import httpx
+import asyncio
+
+# OSRM public server for walking directions
+OSRM_WALK_URL = "https://router.project-osrm.org/route/v1/foot/{lng1},{lat1};{lng2},{lat2}?overview=full&geometries=geojson"
+
+async def get_walking_path(origin_lat, origin_lng, dest_lat, dest_lng):
+    """Get actual walking path from OSRM instead of straight line."""
+    url = OSRM_WALK_URL.format(
+        lng1=origin_lng, lat1=origin_lat,
+        lng2=dest_lng, lat2=dest_lat
+    )
+    try:
+        async with httpx.AsyncClient(timeout=5) as client:
+            resp = await client.get(url)
+            data = resp.json()
+            if data.get("code") == "Ok" and data.get("routes"):
+                coords = data["routes"][0]["geometry"]["coordinates"]
+                # Flip to [lat, lng] for Leaflet
+                return [[c[1], c[0]] for c in coords]
+    except Exception:
+        pass
+    # Fallback: straight line
+    return [[origin_lat, origin_lng], [dest_lat, dest_lng]]
 import numpy as np
 from scipy.spatial import KDTree
 
@@ -647,6 +671,9 @@ def _extract_route_segments(G: nx.DiGraph, path: List[str]) -> Optional[Dict]:
             'geometry': seg.get('geometry', [])
         })
 
+    # Filter out zero-distance transfer segments
+    segments = [s for s in segments if not (s.get('is_transfer') and s.get('distance_m', 0) <= 0)]
+    
     return {
         'path': path,
         'segments': segments,

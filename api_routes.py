@@ -5,7 +5,7 @@ api_routes.py — Core chat and routing endpoints.
 import traceback
 from fastapi import APIRouter, Request
 
-from graph_engine import find_route, find_k_routes
+from graph_engine import find_route, find_k_routes, get_walking_path, haversine
 from llm_engine import parse_chat_intent, normalize_location
 from models import ChatMessage, ChatResponse, RouteRequest, RouteResponse, RouteStep
 from biyahe_score import compute_biyahe_score, rank_routes, get_profile
@@ -150,6 +150,22 @@ async def chat(request: ChatMessage, req: Request):
         # Deduplicate alternatives
         ranked_filtered = [a for a in ranked[1:] if [s.get("route","") for s in a.get("segments",[])] != [s.get("route","") for s in best_route.get("segments",[])]]
         
+        # Enhance walk segments with actual walking paths
+        if route and route.get("segments"):
+            for seg in route["segments"]:
+                if (seg.get("is_transfer") or seg.get("type") == "walk" or "WALK" in str(seg.get("route", ""))) and seg.get("geometry") and len(seg["geometry"]) >= 2:
+                    start = seg["geometry"][0]
+                    end = seg["geometry"][-1]
+                    # start/end are [lng, lat] from backend
+                    walk_path = await get_walking_path(start[1], start[0], end[1], end[0])
+                    if walk_path and len(walk_path) > 2:
+                        # Convert back to [lng, lat] for consistency
+                        seg["geometry"] = [[c[1], c[0]] for c in walk_path]
+                        seg["distance_m"] = sum(
+                            haversine(walk_path[i][0], walk_path[i][1], walk_path[i+1][0], walk_path[i+1][1])
+                            for i in range(len(walk_path)-1)
+                        )
+
         return ChatResponse(
             reply_text=reply_text,
             route_data=route,
