@@ -3,14 +3,14 @@
  * Uses Vite proxy in dev, direct URL in production.
  *
  * Exports:
- *   getApiBaseUrl() → "" in dev, "https://api.para-commute.org" in prod
+ *   getApiBaseUrl() → "" in dev, "https://para-ph-api.onrender.com" in prod
  *   apiGet(path)    → fetch wrapper
  *   apiPost(path, body)
  *   apiPut(path, body)
  *   apiDelete(path)
  */
 
-const PRODUCTION_URL = "https://api.para-commute.org";
+const PRODUCTION_URL = "https://para-ph-api.onrender.com";
 
 /**
  * Returns empty string in dev mode (Vite proxy handles /api, /chat, /admin, /auth).
