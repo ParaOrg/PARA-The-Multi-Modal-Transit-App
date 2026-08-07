@@ -29,7 +29,7 @@ export default function MapComponent({ markers = [], polylines = [], showLegend 
     if (!mapRef.current || mapInstance.current) return;
     const map = L.map(mapRef.current, { zoomControl: false, attributionControl: false })
       .setView(DEFAULT_CENTER, 13);
-    L.tileLayer(TILE_URLS[0], { maxZoom: 20, detectRetina: true }).addTo(map);
+    L.tileLayer("https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}@2x.png", { maxZoom: 20, detectRetina: true, attribution: "&copy; Stadia Maps &copy; OpenStreetMap" }).addTo(map);
     L.control.zoom({ position: "bottomright" }).addTo(map);
     mapInstance.current = map;
     setReady(true);
