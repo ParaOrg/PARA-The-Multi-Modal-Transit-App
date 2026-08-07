@@ -1,192 +1,74 @@
-/**
- * Community.jsx — Community-contributed routes page.
- *
- * Tabs:
- *   Browse — see approved community routes
- *   Upload — submit a new route (GeoJSON file)
- *   Pending — view your pending submissions
- */
-
-import { useState, useEffect, useCallback } from "react";
-import { getApiBaseUrl } from "../utils/api";
-import Navbar from "../components/Navbar";
-import RouteUploader from "../components/RouteUploader";
-import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import { useAuth } from "../context/AuthContext";
 
-const API = getApiBaseUrl();
+const MOCK_THREADS = [
+  { id: 1, user: "JuanDelaCruz", title: "Best Cubao to Makati route at 7am?", replies: 24, votes: 15, time: "2h ago", tag: "Routes" },
+  { id: 2, user: "CommuterQueen", title: "PSA: EDSA Carousel now has free WiFi!", replies: 18, votes: 42, time: "4h ago", tag: "Tips" },
+  { id: 3, user: "JeepneyKing", title: "New UV Express terminal at Ayala - review", replies: 31, votes: 28, time: "6h ago", tag: "Review" },
+  { id: 4, user: "TrafficWizard", title: "LRT-1 extension update: when will it open?", replies: 56, votes: 89, time: "8h ago", tag: "News" },
+  { id: 5, user: "BudgetBiyahe", title: "Cheapest way from Fairview to PITX?", replies: 12, votes: 7, time: "10h ago", tag: "Routes" },
+];
 
 export default function Community() {
   let auth = { isAuthenticated: false };
   try { auth = useAuth(); } catch (_) {}
+  const [showCTA, setShowCTA] = useState(!auth.isAuthenticated);
 
-  if (!auth.isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-          <h1 className="text-3xl font-black text-gray-900 mb-4">🌐 Community Routes</h1>
-          <p className="text-gray-500 mb-8 text-lg">Sign up to upload routes, track commutes, and get full access to Para PH.</p>
-          <Link to="/signup" className="inline-block px-8 py-3 bg-purple-800 text-white rounded-xl font-bold text-sm hover:bg-purple-700 transition-colors">Sign Up — It's Free</Link>
-          <p className="mt-4 text-sm text-gray-400">Already have an account? <Link to="/login" className="text-purple-700 underline">Log in</Link></p>
-        </div>
-      </div>
-    );
-  }
-
-  const [tab, setTab] = useState("browse"); // "browse" | "upload" | "pending"
-  const [routes, setRoutes] = useState([]);
-  const [pending, setPending] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  // ── Fetch routes ────────────────────────────────────
-  const fetchRoutes = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      if (tab === "browse") {
-        const res = await fetch(`${API}/admin/routes/list`);
-        const data = await res.json();
-        // Show only community-submitted approved routes
-        const community = (data.routes || []).filter(
-          (r) => r.is_approved && r.status === "verified",
-        );
-        setRoutes(community);
-      } else if (tab === "pending") {
-        const res = await fetch(`${API}/admin/pending/list`);
-        const data = await res.json();
-        setPending(data.routes || []);
-      }
-    } catch (e) {
-      setError("Failed to load routes. Is the backend running?");
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }, [tab]);
-
-  useEffect(() => {
-    if (tab !== "upload") fetchRoutes();
-  }, [tab, fetchRoutes]);
-
-  // ── Render ──────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
+      
+      {/* Signup CTA Overlay */}
+      {showCTA && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center">
+            <span className="text-5xl">🌟</span>
+            <h2 className="text-2xl font-black text-[#381D65] mt-4">Join the Community</h2>
+            <p className="text-gray-500 mt-2 text-sm">Share routes, get tips, and help fellow commuters navigate Metro Manila.</p>
+            <div className="mt-6 space-y-2">
+              <Link to="/signup" className="block w-full py-3 bg-[#7A4BC8] text-white rounded-xl font-bold text-sm hover:bg-[#381D65] transition-colors">
+                Sign Up — It's Free
+              </Link>
+              <button onClick={() => setShowCTA(false)} className="block w-full py-2 text-gray-400 text-xs hover:text-gray-600">
+                Maybe later
+              </button>
+            </div>
+            <p className="mt-4 text-xs text-gray-400">
+              Already a member? <Link to="/login" className="text-[#7A4BC8] underline">Log in</Link>
+            </p>
+          </div>
+        </div>
+      )}
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-extrabold text-gray-900">🌐 Community Routes</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Contribute and discover transit routes submitted by fellow commuters.
-          </p>
+      {/* Community Feed */}
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-black text-gray-900">Community</h1>
+          <Link to="/community/upload" className="bg-[#7A4BC8] text-white px-4 py-2 rounded-full text-xs font-bold">+ New Post</Link>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 w-fit">
-          {[
-            ["browse", "Browse"],
-            ["upload", "Upload"],
-            ["pending", "Pending"],
-          ].map(([id, label]) => (
-            <button
-              key={id}
-              onClick={() => setTab(id)}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                tab === id
-                  ? "bg-white text-purple-800 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              {label}
-            </button>
+        {/* Thread list */}
+        <div className="space-y-3">
+          {MOCK_THREADS.map((thread) => (
+            <div key={thread.id} className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition-shadow cursor-pointer">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-6 h-6 rounded-full bg-[#D1B6FC] flex items-center justify-center text-[10px] font-bold text-[#381D65]">
+                  {thread.user[0]}
+                </span>
+                <span className="text-xs font-medium text-gray-500">{thread.user}</span>
+                <span className="text-[10px] text-gray-300">{thread.time}</span>
+                <span className="ml-auto text-[10px] bg-[#7A4BC81A] text-[#7A4BC8] px-2 py-0.5 rounded-full font-bold">{thread.tag}</span>
+              </div>
+              <h3 className="font-bold text-[#381D65] text-sm mb-2">{thread.title}</h3>
+              <div className="flex gap-4 text-[10px] text-gray-400">
+                <span>💬 {thread.replies} replies</span>
+                <span>⬆ {thread.votes} votes</span>
+              </div>
+            </div>
           ))}
         </div>
-
-        {/* Error */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-sm text-red-700">
-            ⚠️ {error}
-          </div>
-        )}
-
-        {/* Browse tab */}
-        {tab === "browse" && (
-          <div>
-            {loading ? (
-              <div className="text-center py-12 text-gray-400">Loading routes…</div>
-            ) : routes.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-                <p className="text-gray-400 text-sm">No community routes yet.</p>
-                <button
-                  onClick={() => setTab("upload")}
-                  className="mt-3 text-purple-700 font-semibold text-sm hover:underline"
-                >
-                  Be the first to upload →
-                </button>
-              </div>
-            ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {routes.map((route) => (
-                  <div
-                    key={route.route_uuid}
-                    className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow"
-                  >
-                    <h3 className="font-bold text-gray-900 text-sm truncate">{route.name}</h3>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                      <span className="capitalize">{route.mode}</span>
-                      {route.length_m && <span>📏 {Math.round(route.length_m).toLocaleString()}m</span>}
-                    </div>
-                    <span className="inline-block mt-2 text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">
-                      ✓ Verified
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Upload tab */}
-        {tab === "upload" && (
-          <RouteUploader
-            onSuccess={() => {
-              setTab("pending");
-            }}
-          />
-        )}
-
-        {/* Pending tab */}
-        {tab === "pending" && (
-          <div>
-            {loading ? (
-              <div className="text-center py-12 text-gray-400">Loading pending routes…</div>
-            ) : pending.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-                <p className="text-gray-400 text-sm">No pending submissions.</p>
-              </div>
-            ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {pending.map((route) => (
-                  <div
-                    key={route.route_uuid}
-                    className="bg-white rounded-xl border border-amber-200 p-4"
-                  >
-                    <h3 className="font-bold text-gray-900 text-sm truncate">{route.name}</h3>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                      <span className="capitalize">{route.mode}</span>
-                    </div>
-                    <span className="inline-block mt-2 text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">
-                      ⏳ Pending Review
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

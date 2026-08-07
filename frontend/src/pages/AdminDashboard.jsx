@@ -273,7 +273,7 @@ function InspectorTab() {
       const el = mapRef.current;
       if (!el || mapInst.current) return;
       const map = L.map(el, { zoomControl: true, attributionControl: false }).setView([14.5995, 120.9842], 13);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png", { maxZoom: 19 }).addTo(map);
       mapInst.current = map;
       setMapReady(true);
     }, 500);
@@ -301,7 +301,7 @@ function InspectorTab() {
         if (pts.length < 2) return;
         
         // Polyline
-        L.polyline(pts, { color: lineIdx === 0 ? "#3e00a6" : "#7c3aed", weight: 5, opacity: 0.85 }).addTo(group);
+        L.polyline(pts, { color: lineIdx === 0 ? "#7A4BC8" : "#7c3aed", weight: 5, opacity: 0.85 }).addTo(group);
         pts.forEach(c => bounds.extend(c));
         
         // Arrows
@@ -438,7 +438,7 @@ function InspectorTab() {
       </div>
       <div style={{ flex: 1, position: "relative" }}>
         <div ref={mapRef} style={{ width: "100%", height: "100%" }} />
-        {!mapReady && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "white" }}><div style={{ width: 24, height: 24, border: "3px solid #e9d5ff", borderTopColor: "#3e00a6", borderRadius: "50%", animation: "spin 1s linear infinite" }} /></div>}
+        {!mapReady && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "white" }}><div style={{ width: 24, height: 24, border: "3px solid #e9d5ff", borderTopColor: "#7A4BC8", borderRadius: "50%", animation: "spin 1s linear infinite" }} /></div>}
         {loading && <div style={{ position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)", zIndex: 1000, background: "white", borderRadius: 12, padding: "8px 16px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", fontSize: 12, fontWeight: 600 }}>Loading route…</div>}
         {selectedRoute && !loading && <div style={{ position: "absolute", top: 12, left: 12, zIndex: 1000, background: "rgba(255,255,255,0.95)", borderRadius: 10, padding: 8, fontSize: 11, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>🟢 Start → 🔴 End &nbsp;|&nbsp; 🟠 Click arrows to flip direction</div>}
       </div>
@@ -466,7 +466,7 @@ function ApprovalsTab() {
   useEffect(() => {
     if (!mapRef.current || mapInst.current) return;
     const map = L.map(mapRef.current, { zoomControl: true, attributionControl: false }).setView(MANILA_CENTER, 13);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png", { maxZoom: 19 }).addTo(map);
     layerRef.current = L.layerGroup().addTo(map);
     mapInst.current = map;
     setMapReady(true);

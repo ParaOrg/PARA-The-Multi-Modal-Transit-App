@@ -52,7 +52,7 @@ export default function RoutesExplorer() {
   useEffect(() => {
     if (!mapRef.current || mapInst.current) return;
     const map = L.map(mapRef.current, { zoomControl: false, attributionControl: false }).setView(CENTER, 12);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png", { maxZoom: 19 }).addTo(map);
     L.control.zoom({ position: "bottomright" }).addTo(map);
     layerRef.current = L.layerGroup().addTo(map);
     mapInst.current = map;
@@ -121,7 +121,7 @@ export default function RoutesExplorer() {
       if (!res.ok) throw new Error("No geometry");
       const geo = await res.json();
       layerRef.current?.clearLayers();
-      L.geoJSON(geo, { style: { color: "#3e00a6", weight: 4, opacity: 0.9 } }).addTo(layerRef.current);
+      L.geoJSON(geo, { style: { color: "#7A4BC8", weight: 4, opacity: 0.9 } }).addTo(layerRef.current);
       const bounds = L.geoJSON(geo).getBounds();
       if (bounds.isValid()) mapInst.current?.fitBounds(bounds, { padding: [60, 60] });
     } catch (e) {
@@ -240,7 +240,7 @@ export default function RoutesExplorer() {
                     const res = await fetch(`${API}/admin/routes/geojson?route_id=${route.route_uuid}`);
                     if (!res.ok) continue;
                     const geo = await res.json();
-                    const layer = L.geoJSON(geo, { style: { color: "#3e00a6", weight: 3, opacity: 0.7 } }).addTo(layerRef.current);
+                    const layer = L.geoJSON(geo, { style: { color: "#7A4BC8", weight: 3, opacity: 0.7 } }).addTo(layerRef.current);
                     layer.bindTooltip(route.name, { sticky: true });
                     const b = layer.getBounds();
                     if (b.isValid()) bounds.extend(b);

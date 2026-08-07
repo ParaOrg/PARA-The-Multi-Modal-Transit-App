@@ -11,10 +11,10 @@ import paralogo from "../assets/images/Para1P.png";
 const API = getApiBaseUrl();
 
 const BOTTOM_NAV = [
-  { id: "feed", label: "Feed", icon: "📰", to: "/" },
+  { id: "community", label: "Community", icon: "💬", to: "/community" },
   { id: "explore", label: "Routes", icon: "🗺️", to: "/explore" },
   { id: "search", label: "Search", icon: "🔍", primary: true },
-  { id: "community", label: "Community", icon: "🌟", to: "/community" },
+  { id: "ambag", label: "Ambag", icon: "📤", to: "/community" },
   { id: "profile", label: "Profile", icon: "👤", to: "/profile" },
 ];
 

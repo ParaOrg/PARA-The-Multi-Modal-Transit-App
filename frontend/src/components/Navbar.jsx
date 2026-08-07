@@ -9,7 +9,6 @@ const NAV_LINKS = [
   { to: '/', label: 'Commute' },
   { to: '/explore', label: 'Explore' },
   { to: '/community', label: 'Community' },
-  { to: '/gas-prices', label: 'Gas Prices' },
   { to: '/about', label: 'About' },
   { to: '/admin', label: 'Admin' },
 ];
@@ -80,7 +79,7 @@ export default function Navbar() {
                   key={to}
                   to={to}
                   className={`relative z-[1] flex h-full items-center justify-center rounded-full px-4 text-[0.95rem] font-semibold leading-none tracking-[0.01em] transition-colors duration-200 whitespace-nowrap ${
-                    isActive ? 'text-[#4f00cd]' : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                    isActive ? 'text-[#7A4BC8]' : 'text-gray-600 hover:bg-white hover:text-gray-900'
                   }`}
                 >
                   {label}
@@ -91,7 +90,9 @@ export default function Navbar() {
         </div>
 
         <div className="hidden shrink-0 items-center gap-2.5 md:flex lg:justify-self-end">
-          <GasPriceWidget compact className="w-[12rem] lg:w-[14rem] xl:w-[16rem]" />
+          <Link to="/gas-prices" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 bg-white text-xs font-medium text-gray-500 hover:text-[#7A4BC8] hover:border-[#7A4BC8] transition-colors shadow-sm">
+            <span>⛽</span><span>Gas Prices</span>
+          </Link>
           
           {user && !isGuest ? (
             <button
@@ -102,8 +103,8 @@ export default function Navbar() {
             </button>
           ) : (
             <>
-              <Link to="/login" className="inline-flex h-10 items-center rounded-full px-5 text-sm font-semibold text-gray-700 hover:text-[#4f00cd] transition-colors whitespace-nowrap">Login</Link>
-              <Link to="/signup" className="inline-flex h-10 items-center rounded-full bg-[#4f00cd] px-5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(79,0,205,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#3f00a8] hover:shadow-[0_14px_24px_rgba(79,0,205,0.26)] whitespace-nowrap">Sign Up</Link>
+              <Link to="/login" className="inline-flex h-10 items-center rounded-full px-5 text-sm font-semibold text-gray-700 hover:text-[#7A4BC8] transition-colors whitespace-nowrap">Login</Link>
+              <Link to="/signup" className="inline-flex h-10 items-center rounded-full bg-[#7A4BC8] px-5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(79,0,205,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#3f00a8] hover:shadow-[0_14px_24px_rgba(79,0,205,0.26)] whitespace-nowrap">Sign Up</Link>
             </>
           )}
         </div>
@@ -131,7 +132,7 @@ export default function Navbar() {
             <nav className="flex flex-col px-6 pt-6 pb-6 gap-2 flex-1 overflow-y-auto">
               {NAV_LINKS.map(({ to, label }) => (
                 <Link key={to} to={to} onClick={closeMobile} aria-current={activeLink(to) ? 'page' : undefined}
-                  className={`py-3 px-2 rounded-xl text-[1.95rem] leading-[1.2] font-semibold transition-all duration-200 ${activeLink(to) ? 'text-[#4f00cd] bg-[#f5f0ff]' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'}`}>
+                  className={`py-3 px-2 rounded-xl text-[1.95rem] leading-[1.2] font-semibold transition-all duration-200 ${activeLink(to) ? 'text-[#7A4BC8] bg-[#f5f0ff]' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'}`}>
                   {label}
                 </Link>
               ))}
@@ -140,7 +141,7 @@ export default function Navbar() {
               ) : (
                 <>
                   <Link to="/login" onClick={closeMobile} className="mt-3 inline-flex min-h-11 items-center justify-center rounded-full border-2 border-gray-200 px-5 py-3 text-base font-bold text-gray-800">Login</Link>
-                  <Link to="/signup" onClick={closeMobile} className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#4f00cd] px-5 py-3 text-base font-bold text-white shadow-[0_12px_24px_rgba(79,0,205,0.2)]">Sign Up</Link>
+                  <Link to="/signup" onClick={closeMobile} className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#7A4BC8] px-5 py-3 text-base font-bold text-white shadow-[0_12px_24px_rgba(79,0,205,0.2)]">Sign Up</Link>
                 </>
               )}
             </nav>
