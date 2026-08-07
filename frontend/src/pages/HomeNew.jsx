@@ -28,13 +28,24 @@ export default function HomeNew() {
   const [polylines, setPolylines] = useState([]);
   const [activeRouteData, setActiveRouteData] = useState(null);
   const [showTracker, setShowTracker] = useState(false);
+  const [gpsActive, setGpsActive] = useState(false);
   const messagesEndRef = useRef(null);
+  const gpsCheckRef = useRef(null);
   const navigate = useNavigate();
   const [placeholder, setPlaceholder] = useState("Saan mo gustong pumunta?");
   const fullText = "Saan mo gustong pumunta?";
   const exampleText = "Ex. UPD to UST";
 
   // Placeholder animation
+  
+  // Check GPS status
+  useEffect(() => {
+    const check = () => setGpsActive(!!window.__userLocation);
+    check();
+    gpsCheckRef.current = setInterval(check, 1000);
+    return () => clearInterval(gpsCheckRef.current);
+  }, []);
+
   useEffect(() => {
     if (!chatOpen || messages.length > 0) return;
     let timeouts = [], intervals = [];
@@ -147,6 +158,27 @@ export default function HomeNew() {
       <div className="md:hidden absolute top-4 left-4 z-30 flex items-center gap-2">
         <img src={paralogo} alt="Para PH" className="w-12 h-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.15)]" />
       </div>
+      {/* GPS enable button — always visible when GPS not active */}
+      {!gpsActive && (
+        <button onClick={() => {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                window.__userLocation = [pos.coords.latitude, pos.coords.longitude];
+                // Force reload state
+                setChatOpen(prev => prev);
+              },
+              (err) => alert("Location access denied. Please enable in Settings."),
+              { enableHighAccuracy: true, timeout: 15000 }
+            );
+          } else {
+            alert("Geolocation not supported on this device.");
+          }
+        }} className="md:hidden absolute top-16 right-4 z-30 bg-white rounded-2xl shadow-lg px-3 py-2 flex items-center gap-2 text-xs font-bold text-[#7A4BC8] animate-pulse">
+          <span>📍</span>
+          <span>Enable GPS</span>
+        </button>
+      )}
       <button onClick={() => {
         const m = window.__paraMap;
         if (!m) return;
