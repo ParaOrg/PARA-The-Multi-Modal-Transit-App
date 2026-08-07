@@ -107,11 +107,11 @@ async def chat(request: ChatMessage, req: Request):
 
         # Handle "here" — use GPS coords if available
         if origin_raw.lower() in ("here", "current location", "my location"):
-            user_loc = getattr(request, "user_location", None)
-            if user_loc:
-                origin_geo = {"lat": user_loc.get("lat"), "lon": user_loc.get("lng", user_loc.get("lon")), "found": True, "display_name": "Your Location", "source": "gps"}
+            user_loc = request.user_location
+            if user_loc and user_loc.get("lat"):
+                origin_geo = {"lat": user_loc["lat"], "lon": user_loc.get("lng", user_loc.get("lon", 0)), "found": True, "display_name": "Your Location", "source": "gps"}
             else:
-                origin_geo = None
+                return ChatResponse(reply_text="📍 Please enable GPS to route from your location. Tap ⊕ and allow location access.")
         else:
             origin_geo = await normalize_location(origin_raw)
         
