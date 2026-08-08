@@ -5,6 +5,7 @@ import TripSummaryCard, { RouteCardList } from "../components/TripSummaryCard";
 import CommuteTracker from "../components/CommuteTracker";
 import { getApiBaseUrl } from "../utils/api";
 import paralogo from "../assets/images/Para1P.png";
+import GpsPrompt from "../components/GpsPrompt";
 import Navbar from "../components/Navbar";
 import ChatPanel from "../components/ChatPanel";
 
@@ -128,6 +129,7 @@ export default function HomeNew() {
 
   return (
     <div className="fixed inset-0 bg-white">
+      <GpsPrompt />
       {/* DESKTOP: Original Navbar + ChatPanel */}
       <div className="hidden md:block">
         <Navbar />
