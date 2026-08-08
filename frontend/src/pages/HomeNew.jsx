@@ -300,7 +300,7 @@ export default function HomeNew() {
         style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom))" }}>
         <div className="flex items-end justify-center gap-7 px-4 py-2">
           {BOTTOM_NAV.map((item) => (
-            <button key={item.id} onClick={() => { if (item.id === "search") toggleChat(); else if (item.to) navigate(item.to); }}
+            <button key={item.id} onClick={() => { if (item.id === "search") { if (input.trim()) send(); } else if (item.to) navigate(item.to); }}
               className="flex flex-col items-center gap-0.5">
               {item.primary ? (
                 <div className={`px-4 py-2 rounded-full shadow-md text-xs font-semibold flex items-center gap-1.5 ${chatOpen ? "bg-[#381D65] text-white" : "bg-[#7A4BC8] text-white"}`}>
