@@ -77,8 +77,7 @@ export default function HomeNew() {
   }, [chatOpen, messages.length]);
 
   const toggleChat = () => {
-    setChatOpen(!chatOpen);
-    if (chatOpen) { setMessages([]); setInput(""); setRouteMarkers([]); setPolylines([]); setShowChat(false); }
+    setMessages([]); setInput(""); setRouteMarkers([]); setPolylines([]); setShowChat(false);
   };
 
   const closeChatPanel = () => {
