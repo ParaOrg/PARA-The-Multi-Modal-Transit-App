@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
+import RouteUploader from "../components/RouteUploader";
 
 const MOCK_THREADS = [
   { id: 1, user: "JuanDelaCruz", title: "Best Cubao to Makati route at 7am?", replies: 24, votes: 15, time: "2h ago", tag: "Routes" },
@@ -15,6 +16,7 @@ export default function Community() {
   let auth = { isAuthenticated: false };
   try { auth = useAuth(); } catch (_) {}
   const [showCTA, setShowCTA] = useState(!auth.isAuthenticated);
+  const [showUpload, setShowUpload] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -61,11 +63,19 @@ export default function Community() {
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-black text-gray-900">Community</h1>
-          <Link to="/community/upload" className="bg-[#7A4BC8] text-white px-4 py-2 rounded-full text-xs font-bold">+ New Post</Link>
+          <button onClick={() => setShowUpload(!showUpload)}
+              className="bg-[#7A4BC8] text-white px-4 py-2 rounded-full text-xs font-bold">
+              {showUpload ? "✕ Close" : "+ Record Route"}
+            </button>
         </div>
 
         {/* Thread list */}
-        <div className="space-y-3">
+        {showUpload && (
+        <div className="mb-6">
+          <RouteUploader onSuccess={() => setShowUpload(false)} />
+        </div>
+      )}
+      <div className="space-y-3">
           {MOCK_THREADS.map((thread) => (
             <div key={thread.id} className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex items-center gap-2 mb-1">
