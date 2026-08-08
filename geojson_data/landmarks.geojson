@@ -1,0 +1,30 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Katipunan LRT", "type": "station" },
+      "geometry": { "type": "Point", "coordinates": [121.0743, 14.6340] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Cubao LRT", "type": "station" },
+      "geometry": { "type": "Point", "coordinates": [121.0528, 14.6228] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "UP Diliman", "type": "university" },
+      "geometry": { "type": "Point", "coordinates": [121.0623, 14.6577] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "SM North EDSA", "type": "mall" },
+      "geometry": { "type": "Point", "coordinates": [121.0307, 14.6556] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Quiapo Church", "type": "landmark" },
+      "geometry": { "type": "Point", "coordinates": [120.9842, 14.5980] }
+    }
+  ]
+}
