@@ -28,6 +28,8 @@ export default function HomeNew() {
   const [polylines, setPolylines] = useState([]);
   const [activeRouteData, setActiveRouteData] = useState(null);
   const [showTracker, setShowTracker] = useState(false);
+  const [trackerMinimized, setTrackerMinimized] = useState(false);
+  const [currentTrackSegment, setCurrentTrackSegment] = useState(0);
   const [gpsActive, setGpsActive] = useState(false);
   const messagesEndRef = useRef(null);
   const gpsCheckRef = useRef(null);
@@ -200,7 +202,7 @@ export default function HomeNew() {
 
       {/* CHAT PANEL — appears above pill when showChat is true */}
       {/* ONE unified container — pill at bottom, chat above when expanded */}
-      {chatOpen && (
+      {chatOpen && !showTracker && (
         <div className="absolute left-2 right-2 z-20 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
           style={{ bottom: "84px", maxHeight: showChat ? "50vh" : "auto" }}>
           
@@ -216,7 +218,7 @@ export default function HomeNew() {
                       <div className="mb-2">
                         <RouteCardList routeData={m.routeData} alternatives={m.alternatives || []} />
                         {!showTracker && (
-                          <button onClick={() => setShowTracker(true)} className="w-full mt-1.5 py-1.5 bg-green-500 text-white rounded-lg text-[11px] font-bold">🚀 Start Tracked Commute</button>
+                          <button onClick={() => { setShowTracker(true); setChatOpen(false); }} className="w-full mt-1.5 py-1.5 bg-green-500 text-white rounded-lg text-[11px] font-bold">🚀 Start Tracked Commute</button>
                         )}
                       </div>
                     )}
@@ -235,7 +237,20 @@ export default function HomeNew() {
             </>
           )}
           
-          <div className="flex items-center gap-2 px-3 py-2.5">
+          {trackerMinimized && activeRouteData ? (
+            <div className="flex items-center gap-2 px-3 py-2.5 cursor-pointer" onClick={() => setTrackerMinimized(false)}>
+              <span>🚀</span>
+              <div className="flex-1 flex gap-1">
+                {(activeRouteData?.segments || []).map((seg, i) => (
+                  <div key={i} className="flex-1 h-1 rounded-full" style={{ background: i === currentTrackSegment ? "#7A4BC8" : i < currentTrackSegment ? "#D1B6FC" : "#E9E0FF" }} />
+                ))}
+              </div>
+              <span className="text-xs font-bold text-[#381D65]">{activeRouteData?.total_time_min || 0} min</span>
+              <button onClick={(e) => { e.stopPropagation(); setShowTracker(false); setActiveRouteData(null); setTrackerMinimized(false); }}
+                className="text-gray-400 hover:text-gray-600 text-sm">✕</button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 px-3 py-2.5">
             <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()}
               placeholder={placeholder}
               className="flex-1 text-[13px] outline-none text-[#381D65] placeholder-gray-400" />
@@ -244,15 +259,37 @@ export default function HomeNew() {
               <span className="text-xs">➤</span>
             </button>
           </div>
+          )}
         </div>
       )}
 
       {/* Commute Tracker */}
-      {showTracker && activeRouteData && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center" onClick={() => setShowTracker(false)}>
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-md max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <CommuteTracker routeData={activeRouteData} onComplete={() => { setShowTracker(false); setActiveRouteData(null); }} onCancel={() => setShowTracker(false)} />
+      {/* Minimized progress bar — replaces pill during tracking */}
+      {showTracker && activeRouteData && trackerMinimized && (
+        <div className="absolute left-2 right-2 z-20 bg-[#7A4BC8] text-white rounded-2xl px-4 py-3 shadow-lg cursor-pointer"
+          style={{ bottom: "84px" }}
+          onClick={() => setTrackerMinimized(false)}>
+          <div className="flex items-center gap-2">
+            <span>🚀</span>
+            <div className="flex-1 flex gap-1">
+              {(activeRouteData?.segments || []).map((seg, i) => (
+                <div key={i} className="flex-1 h-1 rounded-full" style={{ background: i === 0 ? "white" : "rgba(255,255,255,0.3)" }} />
+              ))}
+            </div>
+            <span className="text-xs font-bold">{activeRouteData?.total_time_min || 0} min</span>
+            <button onClick={(e) => { e.stopPropagation(); setShowTracker(false); setActiveRouteData(null); setTrackerMinimized(false); }}
+              className="text-white/70 hover:text-white text-sm">✕</button>
           </div>
+        </div>
+      )}
+
+      {/* Full tracker sheet — no dark overlay */}
+      {showTracker && activeRouteData && !trackerMinimized && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl max-h-[45vh] overflow-y-auto">
+          <CommuteTracker routeData={activeRouteData} 
+            onMinimize={() => setTrackerMinimized(true)} onProgress={(seg) => setCurrentTrackSegment(seg)}
+            onComplete={() => { setShowTracker(false); setActiveRouteData(null); setTrackerMinimized(false); }} 
+            onCancel={() => { setShowTracker(false); setTrackerMinimized(false); }} />
         </div>
       )}
 

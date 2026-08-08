@@ -13,13 +13,19 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
-export default function CommuteTracker({ routeData, onComplete, onCancel }) {
+export default function CommuteTracker({ routeData, onComplete, onCancel, onMinimize, onProgress }) {
   const rawSegments = routeData?.segments || [];
   const segments = rawSegments.filter(
     (seg) => seg.route !== "WALK_TO_ROUTE" && seg.route !== "WALK_TO_DEST" && seg.route !== "WALK_TRANSFER"
   );
-  const [phase, setPhase] = useState("waiting"); // waiting | riding | done
+  const [phase, setPhase] = useState("waiting");
+  const [minimized, setMinimized] = useState(false); // waiting | riding | done
   const [currentSegment, setCurrentSegment] = useState(0);
+
+  // Notify parent of segment changes
+  useEffect(() => {
+    if (onProgress) onProgress(currentSegment);
+  }, [currentSegment, onProgress]);
   const [waitStart] = useState(Date.now());
   const [segmentStart, setSegmentStart] = useState(null);
   const [waitTime, setWaitTime] = useState(0);
@@ -37,7 +43,16 @@ export default function CommuteTracker({ routeData, onComplete, onCancel }) {
     timerRef.current = setInterval(() => {
       setWaitTime(Math.floor((Date.now() - waitStart) / 1000));
     }, 1000);
-    return () => clearInterval(timerRef.current);
+    if (minimized) {
+    return (
+      <div className="bg-[#7A4BC8] text-white px-4 py-2 flex items-center justify-between cursor-pointer" onClick={() => onMinimize && onMinimize()}>
+        <span className="text-xs font-bold">🚀 Tracking — {Math.floor((waitTime + segmentTimes.reduce((a, b) => a + b, 0)) / 60)}m</span>
+        <span className="text-xs">▲</span>
+      </div>
+    );
+  }
+
+  return () => clearInterval(timerRef.current);
   }, [phase, waitStart]);
 
   // ── Segment timer ──────────────────────────────────
@@ -50,7 +65,16 @@ export default function CommuteTracker({ routeData, onComplete, onCancel }) {
         return next;
       });
     }, 1000);
-    return () => clearInterval(timerRef.current);
+    if (minimized) {
+    return (
+      <div className="bg-[#7A4BC8] text-white px-4 py-2 flex items-center justify-between cursor-pointer" onClick={() => onMinimize && onMinimize()}>
+        <span className="text-xs font-bold">🚀 Tracking — {Math.floor((waitTime + segmentTimes.reduce((a, b) => a + b, 0)) / 60)}m</span>
+        <span className="text-xs">▲</span>
+      </div>
+    );
+  }
+
+  return () => clearInterval(timerRef.current);
   }, [phase, segmentStart, currentSegment]);
 
   // ── GPS tracking ───────────────────────────────────
@@ -87,7 +111,16 @@ export default function CommuteTracker({ routeData, onComplete, onCancel }) {
   // Start GPS when tracker opens, stop when it closes
   useEffect(() => {
     startGps();
-    return () => stopGps();
+    if (minimized) {
+    return (
+      <div className="bg-[#7A4BC8] text-white px-4 py-2 flex items-center justify-between cursor-pointer" onClick={() => onMinimize && onMinimize()}>
+        <span className="text-xs font-bold">🚀 Tracking — {Math.floor((waitTime + segmentTimes.reduce((a, b) => a + b, 0)) / 60)}m</span>
+        <span className="text-xs">▲</span>
+      </div>
+    );
+  }
+
+  return () => stopGps();
   }, [startGps, stopGps]);
 
   // ── Actions ────────────────────────────────────────
@@ -98,15 +131,15 @@ export default function CommuteTracker({ routeData, onComplete, onCancel }) {
 
   const hopOff = () => {
     setSegmentStart(null);
-    const next = currentSegment + 1;
-    if (next >= segments.length) {
-      // Last segment — done
-      setPhase("done");
-      stopGps();
-    } else {
-      setCurrentSegment(next);
-      setPhase("waiting");
-    }
+    setCurrentSegment(prev => {
+      const next = prev + 1;
+      if (next >= segments.length) {
+        setPhase("done");
+      } else {
+        setPhase("waiting");
+      }
+      return next >= segments.length ? prev : next;
+    });
   };
 
   const finish = () => {
@@ -127,10 +160,19 @@ export default function CommuteTracker({ routeData, onComplete, onCancel }) {
   const currentSeg = segments[currentSegment];
   const isLastSegment = currentSegment >= segments.length - 1;
 
+  if (minimized) {
+    return (
+      <div className="bg-[#7A4BC8] text-white px-4 py-2 flex items-center justify-between cursor-pointer" onClick={() => onMinimize && onMinimize()}>
+        <span className="text-xs font-bold">🚀 Tracking — {Math.floor((waitTime + segmentTimes.reduce((a, b) => a + b, 0)) / 60)}m</span>
+        <span className="text-xs">▲</span>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-lg flex flex-col h-full">
       {/* Header — fixed */}
-      <div className="bg-purple-800 text-white px-4 py-3 flex items-center justify-between shrink-0 rounded-t-3xl">
+      <div className="bg-purple-800 text-white px-4 py-3 flex items-center justify-between shrink-0 rounded-t-3xl cursor-pointer" onClick={() => onMinimize && onMinimize()}>
         <div>
           <p className="font-bold text-sm">🚀 Tracked Commute</p>
           <p className="text-purple-200 text-xs">{routeData?.message}</p>
@@ -222,12 +264,13 @@ export default function CommuteTracker({ routeData, onComplete, onCancel }) {
               <p className="text-3xl mb-1">🎉</p>
               <p className="font-bold text-gray-800">Commute Complete!</p>
               <p className="text-sm text-gray-500 mt-1">
-                Total: {Math.floor((waitTime + segmentTimes.reduce((a, b) => a + b, 0)) / 60)} min
-                · {gpsPoints.length} GPS points
+                {Math.floor((waitTime + segmentTimes.reduce((a, b) => a + b, 0)) / 60)} min total · {segments.filter(s => !s.is_transfer).length} rides
               </p>
             </div>
 
-            {/* Evaluation */}
+            
+
+            {/* Rating */}
             <div>
               <p className="text-sm font-semibold text-gray-700 mb-2">Rate your commute</p>
               <div className="flex justify-center gap-1">
@@ -243,63 +286,39 @@ export default function CommuteTracker({ routeData, onComplete, onCancel }) {
               </div>
             </div>
 
-            {/* Comment */}
-            <div>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Any notes about this commute? (optional)"
-                rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-              />
-            </div>
+{/* Tally CTA */}
+            <a href="https://tally.so/r/J9rzW4" target="_blank" rel="noopener noreferrer"
+              className="block w-full py-3 bg-[#7A4BC8] text-white rounded-xl font-bold text-sm text-center hover:bg-[#381D65] transition-colors">
+              📝 Help us improve — share your experience
+            </a>
 
-            {/* Segment breakdown */}
-            <div className="text-xs space-y-1">
-              <p className="font-semibold text-gray-600">Segment breakdown</p>
-              <div className="flex items-center gap-2 text-gray-500">
-                <span>⏳ Wait:</span>
-                <span>{Math.floor(waitTime / 60)}m {waitTime % 60}s</span>
-              </div>
+            {/* Segment breakdown — compact */}
+            <div className="text-xs space-y-1 bg-gray-50 rounded-lg p-2">
               {segments.map((seg, i) => (
-                <div key={i} className="flex items-center gap-2 text-gray-500">
+                <div key={i} className="flex items-center gap-2 text-gray-600">
                   <span>{seg.is_transfer ? "🚶" : "🚌"}</span>
-                  <span className="truncate">{seg.route || "Transit"}:</span>
-                  <span>{Math.floor((segmentTimes[i] || 0) / 60)}m {(segmentTimes[i] || 0) % 60}s</span>
+                  <span className="truncate">{seg.is_transfer ? "Walk" : seg.route || "Transit"}</span>
+                  <span className="ml-auto tabular-nums">{Math.floor((segmentTimes[i] || 0) / 60)}m {(segmentTimes[i] || 0) % 60}s</span>
                 </div>
               ))}
+              <div className="flex items-center gap-2 text-gray-400 pt-1 border-t border-gray-200">
+                <span>⏳ Wait</span>
+                <span className="ml-auto tabular-nums">{Math.floor(waitTime / 60)}m {waitTime % 60}s</span>
+              </div>
             </div>
 
-            <button
-              onClick={finish}
-              className="w-full py-3 bg-purple-800 text-white rounded-xl font-bold text-sm hover:bg-purple-700 transition-colors"
-            >
+            <button onClick={finish}
+              className="w-full py-3 bg-purple-800 text-white rounded-xl font-bold text-sm hover:bg-purple-700 transition-colors">
               💾 Save & Finish
             </button>
 
-            <button
-              onClick={() => {
-                alert("Share to community coming soon! Your route will be submitted for others to use.");
-              }}
-              className="w-full py-3 bg-green-500 text-white rounded-xl font-bold text-sm hover:bg-green-600 transition-colors"
-            >
-              📤 Share Route to Community
-            </button>
-
-            <button
-              onClick={() => {
-                finish();
-                onCancel();
-              }}
-              className="w-full py-3 border-2 border-purple-800 text-purple-800 rounded-xl font-bold text-sm hover:bg-purple-50 transition-colors"
-            >
+            <button onClick={() => { finish(); onCancel(); }}
+              className="w-full py-3 border-2 border-purple-800 text-purple-800 rounded-xl font-bold text-sm hover:bg-purple-50 transition-colors">
               🚐 Commute Again
             </button>
 
-            <button
-              onClick={onCancel}
-              className="w-full py-2 border border-gray-300 text-gray-500 rounded-lg text-xs hover:bg-gray-50"
-            >
+            <button onClick={onCancel}
+              className="w-full py-2 border border-gray-300 text-gray-500 rounded-lg text-xs hover:bg-gray-50">
               Discard
             </button>
           </div>
